@@ -1,0 +1,63 @@
+#!/bin/bash
+
+### Bash script for mapping trimmed reads from the Convergent Evolution Project to a reference genome. It's assumed that the FastQ file has been trimmed before mapping.
+### James Reeve - University of Calgary
+### 28/11/2018
+### Population: NsABk Sequencing lane 2
+
+# Filepaths
+DATA_FASTQ=/data/fastq/james/Con_evo_project
+DATA_TRIM=/data/not_backup/james/Con_evo_project/trim-data
+DATA_BAM=/data/aligned/james/Con_evo_project
+DATA_REF=/data/home/james/genome
+DATA_HOME=/data/home/james/Con_evo_project
+LOG_PATH=/data/home/james/Con_evo_project/log-files
+
+BWA=/data/programs/bwa-0.7.12/bwa
+SAMTOOLS=/data/programs/samtools-1.9/samtools
+PICARD=/data/programs/picard.jar
+Trimmomatic=/data/programs/Trimmomatic-0.36/trimmomatic-0.36.jar
+
+## Read trimming
+java -jar $Trimmomatic PE -threads 18 -phred33 \
+ $DATA_FASTQ/HI.4883.002.NsABk_R1.fastq.gz $DATA_FASTQ/HI.4883.002.NsABk_R2.fastq.gz \
+ -baseout $DATA_TRIM/HI.4883.002.NsABk \
+ ILLUMINACLIP:TruSeq3-SE.fa:2:30:10 MINLEN:120
+
+## Indexing Reference Genome
+#$BWA index -a bwtsw $DATA_REF/ninespine_genome_draft >> $LOG_PATH/Ns.bwa_index.log 2>&1  
+
+## Read mapping with BWA-MEM
+$BWA mem -t 4 -M $DATA_REF/ninespine_genome_draft \
+	$DATA_TRIM/HI.4883.002.NsABk_1P \
+	$DATA_TRIM/HI.4883.002.NsABk_2P \
+	| $SAMTOOLS sort -o $DATA_BAM/HI.4883.002.NsABk.bam >> $LOG_PATH/NsABk.2.bwa_mem.log 2>&1
+
+## Sort and add read group information (needed for GATK to work)
+java -XX:ParallelGCThreads=4 -Xmx8G -Djava.io.tmpdir=/data/home/james/tmp -jar $PICARD AddOrReplaceReadGroups \
+  I=$DATA_BAM/HI.4883.002.NsABk.bam \
+  O=$DATA_BAM/HI.4883.002.NsABk_sort.bam \
+  RGID=Index_52 \
+  RGLB=MPS12343449-E07 \
+  RGPL=illumina \
+  RGPU=HI.4883.002 \
+  RGSM=NsABk \
+  RGCN=Genome_Quebec \
+  RGDS=Pooled_sample_30_fish \
+  RGDT=2018-11-12 \
+  RGPI=150 >> $LOG_PATH/NsABk.2.ReadInfo.log 2>&1
+
+## Mark duplicates
+java -XX:ParallelGCThreads=4 -Xmx8G -Djava.io.tmpdir=/data/home/james/tmp -jar $PICARD MarkDuplicates \
+  I=$DATA_BAM/HI.4883.002.NsABk_sort.bam \
+  O=$DATA_BAM/HI.4883.002.NsABk_DupMark.bam \
+  M=$DATA_HOME/HI.4883.002.NsABk_duplicate_metrics.txt \
+  OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
+  MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 \
+  CREATE_INDEX=true >> $LOG_PATH/NsABk.2.MarkDuplicates.log 2>&1
+
+## Error Check
+java -XX:ParallelGCThreads=4 -Xmx8G -Djava.io.tmpdir=/data/home/james/tmp -jar $PICARD ValidateSamFile \
+  I=$DATA_BAM/HI.4883.002.NsABk_DupMark.bam \
+  MAX_OPEN_TEMP_FILES=1000 \
+  MODE=SUMMARY >> $LOG_PATH/NsABk.2.ValidateSamFile.log 2>&1
