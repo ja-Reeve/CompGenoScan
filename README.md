@@ -1,2 +1,2 @@
 # CompGenoScan
-Scripts from a Masters project comparing the genome scan results of three speices of fishes
+Comparing genome scan results between the threespine stickleback (*Gasterosteus aculeatus*), ninespine stickleback (*Pungitus pungitus*), and tubesnout (*Aulorhynchus flavidus*). This research was conducted for a the Masters of Science at the University of Calgary, Canada.
