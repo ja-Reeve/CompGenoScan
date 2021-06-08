@@ -2,7 +2,7 @@
 ### This script creates the plot used in figure 4 of my manuscript.
 ### Fig. 4 show the relationship between interspecies correlations and window size
 ### James Reeve
-### Göteborgs Universitet
+### GÃ¶teborgs Universitet
 ### 20/03/2020
 
 ### Prepreation
