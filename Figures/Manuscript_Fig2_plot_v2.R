@@ -252,11 +252,15 @@ Ts.Manhat.He <- ggplot(Ts.He.2, aes(x=POScumm, y=Avg_PI)) +
 
 
 ### Tubesnout
+
+# Find centre point of each chromosome
+Tu.tmp <- Tu.Fst.3 %>% group_by(CHROM) %>% summarize(center=( max(POScumm) + min(POScumm) ) / 2 )
+
 Tu.Manhat.Fst <- ggplot(Tu.Fst.3, aes(x=POScumm, y=Fst)) +
   geom_hline(aes(yintercept = quantile(Tu.Fst$Fst, 0.999)), colour = "red", lty = 2)+
   geom_point( aes(color=CHROM_test), alpha=0.1, size=0.01) +
   scale_color_manual(values = rep(c("navy", "orange"), 12 ))+
-  scale_x_continuous( label = sapply(strsplit(Ts.tmp$CHROM, "r"), `[[`, 2), breaks = Ts.tmp$center ) +
+  scale_x_continuous( label = sapply(strsplit(Tu.tmp$CHROM, "r"), `[[`, 2), breaks = Tu.tmp$center ) +
   scale_y_continuous(expand = c(0, 0), limits = c(0,1), breaks=seq(0,1,0.5)) +
   labs(title = "Tubesnout (Tu)")+
   theme(axis.title = element_blank(),
@@ -270,7 +274,7 @@ Tu.Manhat.He <- ggplot(Tu.He.3, aes(x=POScumm, y=Avg_PI)) +
   geom_hline(yintercept = quantile(Tu.He$Avg_PI, 0.99), colour = "red", lty = 2)+
   geom_point( aes(color=CHROM_test), alpha=0.1, size=0.01) +
   scale_color_manual(values = rep(c("purple", "black"), 12 ))+
-  scale_x_continuous( label = sapply(strsplit(Ts.tmp$CHROM, "r"), `[[`, 2), breaks = Ts.tmp$center ) +
+  scale_x_continuous( label = sapply(strsplit(Tu.tmp$CHROM, "r"), `[[`, 2), breaks = Tu.tmp$center ) +
   scale_y_continuous(expand = c(0, 0), limits = c(0,0.02), breaks=seq(0,0.02,0.01)) +     # remove space between plot area and x axis
   labs(title = "Tubesnout (Tu)")+
   theme(axis.title = element_blank(),
