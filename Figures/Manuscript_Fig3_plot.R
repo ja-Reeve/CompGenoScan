@@ -459,77 +459,35 @@ Ts_Tu.Fst <- read.table("file:///F:/Ts_Tu_50Kdata.txt", header = TRUE)
 Ts_Ns_Tu.Fst <- merge(Ts_Ns.Fst, Ts_Tu.Fst, by = "Gene.Ts")
 Ts_Ns_Tu.Fst$Avg_Fst.Ns <- rowMeans(Ts_Ns_Tu.Fst[,19:20])
 ### Plots
-# Ts vs Tu
-#tmp.1 <- cor.test(Ts_Ns_Tu.Fst$Avg_Fst.Ts.x, Ts_Ns_Tu.Fst$Avg_Fst_NS1.Ns, method = "spearman")
-
+# Ts vs Ns
 Ts_Ns.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
   geom_point(aes(x = Avg_Fst.Ts.x, y = Avg_Fst.Ns, colour = CAND.both, alpha = CAND.both), size = 0.5)+
-  #geom_text(aes(label = paste('rho', "==", round(tmp.1$estimate, 4)), x = 0.85, y = 0.85), parse = TRUE, size = 6)+
   labs(x = expression(Threespine~F[ST]), y = expression(Ninespine~F[ST]),
        colour = "Outlier")+
   lims(y = c(0, 1), x = c(0, 1))+
   coord_fixed()+
-  scale_colour_manual(values = c("purple", "grey", "firebrick", "navy"))+
-  scale_alpha_manual(values = c(1,0.1,1,1))+
+  scale_colour_manual(values = c("grey", "firebrick", "navy"))+
+  scale_alpha_manual(values = c(0.1,1,1))+
   theme(axis.title = element_text(size = txt_size), 
         axis.text = element_text(size = pnt_size),
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white"),
         axis.line = element_line(),legend.position = "NULL")
 
-# Ts vs Ns_NS2
-#tmp.2 <- cor.test(Ts_Ns_Tu.Fst$Avg_Fst.Ts.x, Ts_Ns_Tu.Fst$Avg_Fst_NS2.Ns, method = "spearman")
-
-#Ts_Ns2.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
-#  geom_point(aes(x = Avg_Fst.Ts.x, y = Avg_Fst_NS2.Ns, colour = CAND.both, alpha = CAND.both))+
-  #geom_text(aes(label = paste('rho', "==", round(tmp.2$estimate, 4)), x = 0.85, y = 0.85), parse = TRUE, size = 8)+
-#  labs(x = expression(Threespine~F[ST]), y = expression(Ninespine~NS2~F[ST]),
-#       colour = "Outlier")+
-#  lims(y = c(0, 1), x = c(0, 1))+
-#  coord_fixed()+
-#  scale_colour_manual(values = c("purple", "grey", "firebrick", "navy"))+
-#  scale_alpha_manual(values = c(1,0.1,1,1))+
-#  theme(axis.title = element_text(size = 15), 
-#        axis.text = element_text(size = 8),
-#        panel.grid.minor = element_blank(),
-#        panel.background = element_rect(fill = "white"),
-#        axis.line = element_line(),legend.position = "NULL")
-
-# Ns_NS1 vs Tu
-#tmp.3 <- cor.test(Ts_Ns_Tu.Fst$Avg_Fst_NS1.Ns, Ts_Ns_Tu.Fst$Avg_Fst.Tu, method = "spearman")
-
+# Ns vs Tu
 Ns_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
   geom_point(aes(x = Avg_Fst.Ns, y = Avg_Fst.Tu, colour = CAND.both, alpha = CAND.both), size = 0.5)+
- #geom_text(aes(label = paste('rho', "==", round(tmp.3$estimate, 4)), x = 0.85, y = 0.85), parse = TRUE, size = 8)+
   labs(x = expression(Ninespine~F[ST]), y = expression(Tubesnout~F[ST]),
        colour = "Outlier")+
   lims(y = c(0, 1), x = c(0, 1))+
   coord_fixed()+
-  scale_colour_manual(values = c("purple", "grey", "firebrick", "navy"))+
-  scale_alpha_manual(values = c(1,0.1,1,1))+
+  scale_colour_manual(values = c("grey", "firebrick", "navy"))+
+  scale_alpha_manual(values = c(0.1,1,1))+
   theme(axis.title = element_text(size = txt_size), 
         axis.text = element_text(size = pnt_size),
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white"),
         axis.line = element_line(),legend.position = "NULL")
-
-# Ns_NS2 vs Tu
-#tmp.4 <- cor.test(Ts_Ns_Tu.Fst$Avg_Fst_NS2.Ns, Ts_Ns_Tu.Fst$Avg_Fst.Tu, method = "spearman")
-
-#Ns2_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
-#  geom_point(aes(x = Avg_Fst_NS2.Ns, y = Avg_Fst.Tu, colour = CAND.both, alpha = CAND.both))+
-  #geom_text(aes(label = paste('rho', "==", round(tmp.4$estimate, 4)), x = 0.85, y = 0.85), parse = TRUE, size = 8)+
-#  labs(x = expression(Ninespine~NS2~F[ST]), y = expression(Tubesnout~F[ST]),
-#       colour = "Outlier")+
-#  lims(y = c(0, 1), x = c(0, 1))+
-#  coord_fixed()+
-#  scale_colour_manual(values = c("purple", "grey", "firebrick", "navy"))+
-#  scale_alpha_manual(values = c(1,0.1,1,1))+
-#  theme(axis.title = element_text(size = 15), 
-#        axis.text = element_text(size = 8),
-#        panel.grid.minor = element_blank(),
-#        panel.background = element_rect(fill = "white"),
-#        axis.line = element_line(),legend.position = "NULL")
 
 # Ts vs Tu
 #tmp.5 <- cor.test(Ts_Ns_Tu.Fst$Avg_Fst.Ts.x, Ts_Ns_Tu.Fst$Avg_Fst.Tu, method = "spearman")
@@ -541,8 +499,8 @@ Ts_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
        colour = "Outlier")+
   lims(y = c(0, 1), x = c(0, 1))+
   coord_fixed()+
-  scale_colour_manual(values = c("purple", "grey", "firebrick", "navy"))+
-  scale_alpha_manual(values = c(1,0.1,1,1))+
+  scale_colour_manual(values = c("grey", "firebrick", "navy"))+
+  scale_alpha_manual(values = c(0.1,1,1))+
   theme(axis.title = element_text(size = txt_size), 
         axis.text = element_text(size = pnt_size),
         panel.grid.minor = element_blank(),
