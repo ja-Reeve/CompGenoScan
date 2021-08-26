@@ -1,72 +1,110 @@
-####### Manuscript figure 4 ################
-### This script creates the plot used in figure 4 of my manuscript.
-### Fig. 4 show the relationship between interspecies correlations and window size
-### James Reeve
-### Göteborgs Universitet
-### 20/03/2020
+################# Fig. 4 Con Evo Project ##########################
+### The following code was used to generate Figure 4 in my manuscript
+### This figure shows a two panel plot of the Null-W test A) between threespine top candidates and
+### tubesnout orthologs (Ts_Tu) and B) between tubesnout top candidates and threespine orthologs
+### James Reeve - University of Calgary
+### 08/10/2019
 
-### Prepreation
+### A: Preperation ####
 rm(list = ls())
+options(stringsAsFactors =  FASLE)
 dev.off()
 
 ### Packages
-library("ggplot2"); library("cowplot")
+library("ggplot2")
+library("grid")
+library("gridExtra")
+library("cowplot")
 
-### Access data
-# Genetic diversity
-Corr.dat.He <- read.csv("file:///C:/Users/James/Dropbox (Personal)/Master's/correlation_table.csv", header = TRUE)
-Corr.dat.He$window.size <- factor(Corr.dat.He$window.size, levels = c("GENE", "10K", "25K", "50K", "75K", "100K"))
+### Plot size parameters
+txt_size <- 6 # Label text size
+pnt_size <- 5 # Axis tick size
 
-# Fst
-Corr.dat.Fst <- read.csv("file:///C:/Users/James/Dropbox (Personal)/Master's/correlation_table_Fst.csv", header = TRUE)
-Corr.dat.Fst$window.size <- factor(Corr.dat.Fst$window.size, levels = c("GENE", "10K", "25K", "50K", "75K", "100K"))
+### B: Access data ####
 
-### Plot correlations within species
-# genetic diversity
-tmp <- Corr.dat.He[Corr.dat.He$contrast == "TsAK_TuAK" | Corr.dat.He$contrast == "TuAK_TuBC" | Corr.dat.He$contrast == "NsNUn_NsNUd" |
-                     Corr.dat.He$contrast == "NsNUn_NsABm" | Corr.dat.He$contrast == "NsNUn_NsABk" | Corr.dat.He$contrast == "NsNUd_NsABk" |
-                     Corr.dat.He$contrast == "NsNUd_NsABm" | Corr.dat.He$contrast == "NsABk_NsABm", ]
+### Top candidate data
+Cands.Ts <- read.table("file:///F:/top-candidate/Ts.VarScan.TopCandidates.txt", header = TRUE)
+Cands.Tu <- read.table("file:///F:/top-candidate/Tu.VarScan.TopCandidates.txt", header = TRUE)
+# Remove non-genes
+Cands.Ts <- Cands.Ts[Cands.Ts$Gene_Name != "itgr",]
+Cands.Tu <- Cands.Tu[Cands.Tu$Gene_Name != "itgr",]
 
-tmp$species <- substring(tmp$contrast, 1, 2)
+### Null-W results
+Ts_Tu_cands <- read.table("file:///F:/Null-W/Ts_Tu_NullW_cands.txt", header = TRUE, sep = "\t")
+Ts_Tu_control <- read.table("file:///F:/Null-W/Ts_Tu_NullW_control.txt", header = TRUE, sep = "\t")
+Tu_Ts_cands <- read.table("file:///F:/Null-W/Tu_Ts_NullW_cands.txt", header = TRUE, sep = "\t")
+Tu_Ts_control <- read.table("file:///F:/Null-W/Tu_Ts_NullW_control.txt", header = TRUE, sep = "\t")
 
-P1 <- ggplot(tmp, aes(x = window.size, y = spearman, colour = species, group = contrast))+
-  geom_hline(yintercept = 0.0, lty = 2, colour = "lightgrey")+
-  geom_line(aes(lty = contrast))+
-  geom_point(aes(pch = contrast), show.legend = F)+
-  scale_linetype_manual(values = c(2:6, 2, 1, 1))+
-  scale_shape_manual(values = c(2:6, 2, 16, 16))+
-  labs(y = expression("Within-species Spearman's"~rho), lty = "Population contrast")+
-  ylim(c(-0.2, 1.0))+
-  theme_classic()+ theme(axis.title.x = element_blank(), 
-                         axis.title.y = element_text(size = 14))
+### C: Plot top candidate plots
+### Plot
+cands_plot <- function(data, species){
+  ggplot(data %>% arrange(SNPs_in_Gene))+
+    geom_point(aes(SNPs_in_Gene, Observed_Outliers, 
+                   colour = Observed_Outliers > Expected_Outliers), 
+               size = 0.4)+
+    geom_line(aes(SNPs_in_Gene, Expected_Outliers), colour="firebrick")+
+    ggtitle(paste0(species, ": B = 0.9999 Q = 999th"))+
+    scale_colour_manual(values = c("TRUE" = "orange", "FALSE" = "navy"))+
+    theme_bw()+
+    ylim(c(0,120))+
+    xlim(c(0, 1800))+
+    theme(axis.title = element_blank(),
+          plot.title = element_text(size = txt_size-2),
+          axis.text = element_text(size = pnt_size),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          legend.position = "none")
+}
 
-### Plot correlations among species
-# Fst
-P2 <- ggplot(Corr.dat.Fst, aes(x = window.size, y = spearman, group = contrast, colour = contrast))+
-  geom_hline(yintercept = 0.0, lty = 2, colour = "lightgrey")+
-  geom_line(aes(lty = contrast))+
-  geom_point(aes(pch = contrast))+
-  scale_colour_manual(values = c("black", "firebrick", "firebrick", "navy", "navy", "orange"))+
-  labs(y = expression(~"Spearman's"~rho), colour = "Population contrast",
-       title = expression(F[ST]))+
-  ylim(c(-0.05, 0.1))+
-  theme_classic()+ theme(axis.title.x = element_blank(), 
-                         axis.title.y = element_text(size = 14))
+Plot.Ts <- cands_plot(Cands.Ts, "Threespine stickleback")
+Plot.Tu <- cands_plot(Cands.Tu, "Tubesnout")
 
-#genetic diversity
-tmp <- Corr.dat.He <- Corr.dat.He[Corr.dat.He$contrast == "AvgTs_AvgNs" | Corr.dat.He$contrast == "AvgTs_AvgTu" | 
-                                    Corr.dat.He$contrast == "AvgNs_AvgTu", ]
+### Combine into multi-panel plot
+tmp_plot <- plot_grid(Plot.Ts, Plot.Tu, labels = c("A", "B"), label_size = txt_size*1.5)
+labsX <- textGrob("SNPs in Gene", gp=gpar(fontface = "bold", fontsize = txt_size))
+labsY <- textGrob("Observed Outliers", gp=gpar(fontface="bold", fontsize = txt_size), rot = 90)
 
-P3 <- ggplot(tmp, aes(x = window.size, y = spearman, group = contrast, colour = contrast))+
-  geom_hline(yintercept = 0.0, lty = 2, colour = "lightgrey")+
-  geom_line(aes(lty = contrast))+
-  geom_point(aes(pch = contrast))+
-  scale_colour_manual(values = c("firebrick", "navy", "orange"))+
-  labs(x = "Window size", y = expression("Spearman's"~rho), colour = "Population contrast",
-       title = expression(bar(H)[E]))+
-  ylim(c(-0.1, 0.2))+
-  theme_classic()+ theme(axis.title = element_text(size = 14))
+Fig4a <- grid.arrange(arrangeGrob(tmp_plot), left = labsY, bottom = labsX)
 
-### Full figure
+### D: Plot Null-W test ####
+Ts.Tu.plot <- ggplot()+
+  geom_density(data = Ts_Tu_control, aes(x = Zscore), fill = "lightgrey")+
+  geom_jitter(data = Ts_Tu_cands, aes(x = Zscore, y = 0.025), 
+              size = 0.4, colour = "navy", height = 0.01, width = 0)+
+  geom_vline(xintercept = quantile(Ts_Tu_control$Zscore, 0.95), colour = "red", lty = 2)+
+  labs(title = "Tubesnout orthologs to threespine candidates")+
+  lims(x = c(-30, 40), y = c(0, 0.17))+
+  theme(axis.title = element_blank(),
+        plot.title = element_text(size = txt_size-2),
+        axis.text = element_text(size = pnt_size),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"),
+        axis.line = element_line())
 
-plot_grid(P2, P3, labels = c("A", "B"), label_size = 18, nrow = 2, rel_heights = c(1, 2))
+Tu.Ts.plot <- ggplot()+
+  geom_density(data = Tu_Ts_control, aes(x = Zscore), fill = "lightgrey")+
+  geom_jitter(data = Tu_Ts_cands, aes(x = Zscore, y = 0.025), 
+              size = 0.4, colour = "navy", height = 0.01, width = 0)+
+  geom_vline(xintercept = quantile(Tu_Ts_control$Zscore, 0.95), colour = "red", lty = 2)+
+  labs(title = "Threespine orthologs to tubesnout candidates")+
+  lims(x = c(-30, 40), y = c(0, 0.17))+
+  theme(axis.title = element_blank(),
+        plot.title = element_text(size = txt_size-2),
+        axis.text = element_text(size = pnt_size),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white"),
+        axis.line = element_line())
+
+### Combine into multi-panel plot
+tmp_plot <- plot_grid(Ts.Tu.plot, Tu.Ts.plot, labels = c("C", "D"), label_size = txt_size*1.5)
+labsX <- textGrob("Z-scores", gp=gpar(fontface = "bold", fontsize = txt_size))
+labsY <- textGrob("Density", gp=gpar(fontface="bold", fontsize = txt_size), rot = 90)
+
+Fig4b <- grid.arrange(arrangeGrob(tmp_plot), left = labsY, bottom = labsX)
+
+
+### E: Full plot ####
+tiff("/Users/james/Dropbox (Personal)/Comp_geno_2020/Figure_4.tiff", width = 8, height = 6,
+     units = "cm", res = 100)
+plot_grid(Fig4a, Fig4b, nrow = 2)
+dev.off()
