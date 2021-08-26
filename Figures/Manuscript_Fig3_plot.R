@@ -316,13 +316,16 @@ Ts_Ns_Tu$Outliers.Ns_Tu <- outlier.overlaps(Ts_Ns_Tu$Outliers.Ns, Ts_Ns_Tu$Outli
 
 
 ### Create plots
+txt_size <- 6 # Label text size
+pnt_size <- 5 # Axis tick size
+
 Ts_Ns.plot.He <- ggplot(Ts_Ns_Tu)+
   geom_point(aes(x = Avg_He.Ts, y = Avg_He.Ns, colour = Outliers.Ts_Ns), size = 0.5)+
   geom_vline(xintercept = c(quantile(Ts.He$Avg_He, 0.01), quantile(Ts.He$Avg_He, 0.99)), colour = "red", lty = 3)+
   geom_hline(yintercept = c(quantile(Ns.He$Avg_He, 0.01), quantile(Ns.He$Avg_He, 0.99)), colour = "red", lty = 3)+
   labs(x = expression(Threespine~bar(H)[E]), y = expression(Ninespine~bar(H)[E]))+
   scale_colour_manual(values = c("navy", "grey", "navy"))+
-  theme_classic()+ theme(axis.title = element_text(size = 16), axis.text = element_text(size = 8), legend.position = "none")
+  theme_classic()+ theme(axis.title = element_text(size = txt_size), axis.text = element_text(size = pnt_size -1), legend.position = "none")
 
 Ts_Tu.plot.He <- ggplot(Ts_Ns_Tu)+
   geom_point(aes(x = Avg_He.Ts, y = Avg_He.Tu, colour = Outliers.Ts_Tu), size = 0.5)+
@@ -330,7 +333,7 @@ Ts_Tu.plot.He <- ggplot(Ts_Ns_Tu)+
   geom_hline(yintercept = c(quantile(Tu.He$Avg_He, 0.01), quantile(Tu.He$Avg_He, 0.99)), colour = "red", lty = 3)+
   labs(x = expression(Threespine~bar(H)[E]), y = expression(Tubesnout~bar(H)[E]))+
   scale_colour_manual(values = c("firebrick", "grey", "navy", "navy"))+
-  theme_classic()+ theme(axis.title = element_text(size = 16), axis.text = element_text(size = 8), legend.position = "none")
+  theme_classic()+ theme(axis.title = element_text(size = txt_size), axis.text = element_text(size = pnt_size - 1), legend.position = "none")
 
 Ns_Tu.plot.He <- ggplot(Ts_Ns_Tu)+
   geom_point(aes(x = Avg_He.Ns, y = Avg_He.Tu, colour = Outliers.Ns_Tu), size = 0.5)+
@@ -338,7 +341,7 @@ Ns_Tu.plot.He <- ggplot(Ts_Ns_Tu)+
   geom_hline(yintercept = c(quantile(Tu.He$Avg_He, 0.01), quantile(Tu.He$Avg_He, 0.99)), colour = "red", lty = 3)+
   labs(x = expression(Ninespine~bar(H)[E]), y = expression(Tubesnout~bar(H)[E]))+
   scale_colour_manual(values = c("navy", "grey", "navy"))+
-  theme_classic()+ theme(axis.title = element_text(size = 16), axis.text = element_text(size = 8), legend.position = "none")
+  theme_classic()+ theme(axis.title = element_text(size = txt_size), axis.text = element_text(size = pnt_size - 1), legend.position = "none")
 
 Fig3a <- grid.arrange(grobs = list(Ts_Ns.plot.He, Ts_Tu.plot.He, Ns_Tu.plot.He), ncol = 1)
 
@@ -427,7 +430,7 @@ rm(Res, t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,
 ### Create heatmap plot
 fig3b <- ggplot(correlations2, aes(x = pop1, y = pop2))+
   geom_tile(aes(fill = abs(rho)))+
-  geom_text(aes(label = sig), size = 5)+
+  geom_text(aes(label = sig), size = pnt_size)+
   geom_hline(yintercept = c(2.5, 6.5), lty = 2, colour = "grey")+
   geom_vline(xintercept = c(2.5, 6.5), lty = 2, colour = "grey")+
   labs(fill = expression(Spearman~rho))+
@@ -436,12 +439,13 @@ fig3b <- ggplot(correlations2, aes(x = pop1, y = pop2))+
   scale_x_discrete(limits = c("TsAK", "TsOR", "NsNUn", "NsNUd", "NsABk", "NsABm", "TuAK", "TuBC"), position = "top")+
   scale_y_discrete(limits = rev(c("TsAK", "TsOR", "NsNUn", "NsNUd", "NsABk", "NsABm", "TuAK", "TuBC")))+
   theme(axis.title = element_blank(),
-        axis.text = element_text(size = 14),
+        axis.text = element_text(size = txt_size),
         panel.background = element_rect(fill = "white", colour = NA),
         panel.border = element_rect(colour = "grey", fill=NA),
         legend.position = "bottom",
-        legend.title = element_text(size = 12, hjust = 1, vjust = 0.7),
-        legend.key.width = unit(3, "cm"))
+        legend.title = element_text(size = txt_size, hjust = 1, vjust = 0.7),
+        legend.text = element_text(size = txt_size-2)#,
+        )#legend.key.width = unit(3, "cm"))
 
 
 
@@ -459,7 +463,7 @@ Ts_Ns_Tu.Fst$Avg_Fst.Ns <- rowMeans(Ts_Ns_Tu.Fst[,19:20])
 #tmp.1 <- cor.test(Ts_Ns_Tu.Fst$Avg_Fst.Ts.x, Ts_Ns_Tu.Fst$Avg_Fst_NS1.Ns, method = "spearman")
 
 Ts_Ns.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
-  geom_point(aes(x = Avg_Fst.Ts.x, y = Avg_Fst.Ns, colour = CAND.both, alpha = CAND.both))+
+  geom_point(aes(x = Avg_Fst.Ts.x, y = Avg_Fst.Ns, colour = CAND.both, alpha = CAND.both), size = 0.5)+
   #geom_text(aes(label = paste('rho', "==", round(tmp.1$estimate, 4)), x = 0.85, y = 0.85), parse = TRUE, size = 6)+
   labs(x = expression(Threespine~F[ST]), y = expression(Ninespine~F[ST]),
        colour = "Outlier")+
@@ -467,8 +471,8 @@ Ts_Ns.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
   coord_fixed()+
   scale_colour_manual(values = c("purple", "grey", "firebrick", "navy"))+
   scale_alpha_manual(values = c(1,0.1,1,1))+
-  theme(axis.title = element_text(size = 15), 
-        axis.text = element_text(size = 8),
+  theme(axis.title = element_text(size = txt_size), 
+        axis.text = element_text(size = pnt_size),
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white"),
         axis.line = element_line(),legend.position = "NULL")
@@ -495,7 +499,7 @@ Ts_Ns.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
 #tmp.3 <- cor.test(Ts_Ns_Tu.Fst$Avg_Fst_NS1.Ns, Ts_Ns_Tu.Fst$Avg_Fst.Tu, method = "spearman")
 
 Ns_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
-  geom_point(aes(x = Avg_Fst.Ns, y = Avg_Fst.Tu, colour = CAND.both, alpha = CAND.both))+
+  geom_point(aes(x = Avg_Fst.Ns, y = Avg_Fst.Tu, colour = CAND.both, alpha = CAND.both), size = 0.5)+
  #geom_text(aes(label = paste('rho', "==", round(tmp.3$estimate, 4)), x = 0.85, y = 0.85), parse = TRUE, size = 8)+
   labs(x = expression(Ninespine~F[ST]), y = expression(Tubesnout~F[ST]),
        colour = "Outlier")+
@@ -503,8 +507,8 @@ Ns_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
   coord_fixed()+
   scale_colour_manual(values = c("purple", "grey", "firebrick", "navy"))+
   scale_alpha_manual(values = c(1,0.1,1,1))+
-  theme(axis.title = element_text(size = 15), 
-        axis.text = element_text(size = 8),
+  theme(axis.title = element_text(size = txt_size), 
+        axis.text = element_text(size = pnt_size),
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white"),
         axis.line = element_line(),legend.position = "NULL")
@@ -531,7 +535,7 @@ Ns_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
 #tmp.5 <- cor.test(Ts_Ns_Tu.Fst$Avg_Fst.Ts.x, Ts_Ns_Tu.Fst$Avg_Fst.Tu, method = "spearman")
 
 Ts_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
-  geom_point(aes(x = Avg_Fst.Ts.x, y = Avg_Fst.Tu, colour = CAND.both, alpha = CAND.both))+
+  geom_point(aes(x = Avg_Fst.Ts.x, y = Avg_Fst.Tu, colour = CAND.both, alpha = CAND.both), size = 0.5)+
   #geom_text(aes(label = paste('rho', "==", round(tmp.5$estimate, 4)), x = 0.85, y = 0.85), parse = TRUE, size = 8)+
   labs(x = expression(Threespine~F[ST]), y = expression(Tubesnout~F[ST]),
        colour = "Outlier")+
@@ -539,8 +543,8 @@ Ts_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
   coord_fixed()+
   scale_colour_manual(values = c("purple", "grey", "firebrick", "navy"))+
   scale_alpha_manual(values = c(1,0.1,1,1))+
-  theme(axis.title = element_text(size = 15), 
-        axis.text = element_text(size = 8),
+  theme(axis.title = element_text(size = txt_size), 
+        axis.text = element_text(size = pnt_size),
         panel.grid.minor = element_blank(),
         panel.background = element_rect(fill = "white"),
         axis.line = element_line(),legend.position = "NULL")
@@ -550,4 +554,8 @@ Ts_Tu.Fstplot <- ggplot(Ts_Ns_Tu.Fst)+
 Fig3c <- grid.arrange(grobs = list(Ts_Ns.Fstplot, Ts_Tu.Fstplot, Ns_Tu.Fstplot), ncol = 1)
 #rm(tmp.1, tmp.2, tmp.3, tmp.4, tmp.5)
 
-plot_grid(Fig3a, fig3b, Fig3c, nrow = 1, rel_widths = c(1,3,1), labels = "AUTO", label_size = 24, scale = 0.98)
+# Save plot
+tiff("/Users/james/Dropbox (Personal)/Comp_geno_2020/Figure_3.tiff", width = 18, height = 10,
+     units = "cm", res = 300)
+plot_grid(Fig3a, fig3b, Fig3c, nrow = 1, rel_widths = c(1,2,1), labels = "AUTO", label_size = txt_size * 2, scale = 0.98)
+dev.off()
