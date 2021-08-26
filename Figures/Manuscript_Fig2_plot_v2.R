@@ -132,16 +132,16 @@ new_chrom_list <- c("chr1", "chr2", "chr3", "chr4", "chr9", "chr5", "chr6", "chr
                        "chr20", "chr21")
 for (i in 1:length(new_chrom_list)) {
   Ts.He[Ts.He$CHROM == chrom_list[i],1] <- new_chrom_list[i]
-  Tu.He.2[Tu.He.2$CHROM_Ts == chrom_list[i], "CHROM_Ts"] <- new_chrom_list[i]
+  #Tu.He.2[Tu.He.2$CHROM_Ts == chrom_list[i], "CHROM_Ts"] <- new_chrom_list[i]
   Ns.He.2[Ns.He.2$CHROM_Ts == chrom_list[i], "CHROM_Ts"] <- new_chrom_list[i]
   
-  Tu.Fst.2[Tu.Fst.2$CHROM_Ts == chrom_list[i], "CHROM_Ts"] <- new_chrom_list[i]
+  #Tu.Fst.2[Tu.Fst.2$CHROM_Ts == chrom_list[i], "CHROM_Ts"] <- new_chrom_list[i]
   Ns.Fst.2[Ns.Fst.2$CHROM_Ts == chrom_list[i], "CHROM_Ts"] <- new_chrom_list[i]
 }; rm(i, chrom_list, new_chrom_list)
 
 # Chage "HiC_chromosome_" to "chr" for Tu
-Tu.He.2$CHROM <- gsub("HiC_chromosome_", "chr", Tu.He.2$CHROM)
-Tu.Fst.2$CHROM <- gsub("HiC_chromosome_", "chr", Tu.Fst.2$CHROM)
+Tu.He$CHROM <- gsub("HiC_chromosome_", "chr", Tu.He$CHROM)
+Tu.Fst$CHROM <- gsub("HiC_chromosome_", "chr", Tu.Fst$CHROM)
 
 ### D: Downsample Fst ####
 ### Downsample Fst scores - this saves on processing power while still showing genetic patterns
@@ -185,11 +185,11 @@ Ts.He.2 <- Ts.He %>% group_by(CHROM_test) %>% summarise(chrom_len=max(MID_POS)) 
   arrange(CHROM_test, MID_POS) %>% mutate(POScumm=MID_POS+tot)
 
 # Tubesnout He
-Tu.He.2$CHROM_test <- factor(Tu.He.2$CHROM, levels = paste0("chr",1:23))
+Tu.He$CHROM_test <- factor(Tu.He$CHROM, levels = paste0("chr",1:23))
 
-Tu.He.3 <- Tu.He.2 %>% group_by(CHROM_test) %>% summarise(chrom_len=max(MID_POS)) %>%
+Tu.He.2 <- Tu.He %>% group_by(CHROM_test) %>% summarise(chrom_len=max(MID_POS)) %>%
   mutate(tot=cumsum(chrom_len)-chrom_len) %>% select(-chrom_len) %>%
-  left_join(Tu.He.2, ., by = c("CHROM_test"="CHROM_test")) %>%
+  left_join(Tu.He, ., by = c("CHROM_test"="CHROM_test")) %>%
   arrange(CHROM_test, MID_POS) %>% mutate(POScumm=MID_POS+tot)
 
 # Ninespine He
@@ -270,7 +270,7 @@ Tu.Manhat.Fst <- ggplot(Tu.Fst.3, aes(x=POScumm, y=Fst)) +
         axis.line = element_line(),
         legend.position = "None")
 
-Tu.Manhat.He <- ggplot(Tu.He.3, aes(x=POScumm, y=Avg_PI)) +
+Tu.Manhat.He <- ggplot(Tu.He.2, aes(x=POScumm, y=Avg_PI)) +
   geom_hline(yintercept = quantile(Tu.He$Avg_PI, 0.99), colour = "red", lty = 2)+
   geom_point( aes(color=CHROM_test), alpha=0.1, size=0.01) +
   scale_color_manual(values = rep(c("purple", "black"), 12 ))+
