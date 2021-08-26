@@ -62,15 +62,15 @@ GeneAsign <- function(data, gene.annotation){
                              gene.annotation$Gene_End <= Epos, ]
     if(nrow(dat) == 0)next
 
-    tmp[[i]] <- data.frame("CHROM" = Chrom, 
-                           "Start_Pos" = Spos, 
-                           "End_Pos" = Epos, 
-                           "Gene" = dat$Gene_Name[i],
+    tmp[[i]] <- data.frame("CHROM" = dat$Chromosome, 
+                           "Start_Pos" = dat$Gene_Start, 
+                           "End_Pos" = dat$Gene_End, 
+                           "Gene" = dat$Gene_Name,
                            "North_He" = data[i, 4],
                            "South_He" = data[i, 5],
                            "Avg_He" = data[i, "Avg_He"],
                            "Avg_Fst" = data[i, "Avg_Fst"],
-                           "CAND" = dat$CAND[i],
+                           "CAND" = dat$CAND,
                            "WINDOW" = data[i,"WINDOW"])
     
     rm(Chrom, Spos, Epos, dat)
