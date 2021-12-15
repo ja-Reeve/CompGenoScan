@@ -11,7 +11,7 @@ options(stringsAsFactors =  FASLE)
 dev.off()
 
 ### Packages
-library("ggplot2")
+library("tidyverse")
 library("grid")
 library("gridExtra")
 library("cowplot")
